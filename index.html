@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>暖火拼圖活動 Prototype</title>
+  <style>
+    :root {
+      --ink: #2c2130;
+      --deep: #33203e;
+      --purple: #7b44d8;
+      --purple-dark: #4b2579;
+      --blue: #7bd9ff;
+      --blue-dark: #187bb0;
+      --mint: #7cc96c;
+      --gold: #ffd05a;
+      --cream: #fff8e7;
+      --paper: #f7efd9;
+      --snow: #e9fbff;
+      --stage-glow: rgba(121, 220, 255, .62);
+      --warm-glow: rgba(255, 202, 92, .72);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,.95), rgba(212,247,255,.68) 18%, transparent 42%),
+        linear-gradient(160deg, #8fcdeb 0%, #c4f1e7 45%, #9fd7f4 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -12vh -10vw;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 48% 34%, transparent 0 18%, rgba(255,255,255,.28) 19% 20%, transparent 21% 100%),
+        radial-gradient(ellipse at 50% 40%, transparent 0 31%, rgba(255,255,255,.18) 32% 33%, transparent 34% 100%),
+        radial-gradient(ellipse at 52% 44%, transparent 0 43%, rgba(61,141,190,.16) 44% 45%, transparent 46% 100%);
+      transform: rotate(-13deg);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .phone {
+      position: relative;
+      width: min(430px, 100vw);
+      height: min(930px, 100svh);
+      min-height: 720px;
+      overflow: hidden;
+      background: #8ed8ec;
+      border-left: 2px solid rgba(38,42,64,.28);
+      border-right: 2px solid rgba(38,42,64,.28);
+      box-shadow: 0 24px 80px rgba(25,49,83,.35);
+      isolation: isolate;
+    }
+
+    .main-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      pointer-events: none;
+    }
+
+    .screen-hotspot {
+      position: absolute;
+      left: 120px;
+      right: 120px;
+      bottom: 112px;
+      z-index: 2;
+      height: 84px;
+      border: 0;
+      border-radius: 26px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .clouds {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 0% 44%, #f7fff0 0 13%, transparent 14%),
+        radial-gradient(circle at 18% 46%, #f7fff0 0 16%, transparent 17%),
+        radial-gradient(circle at 78% 46%, #f7fff0 0 17%, transparent 18%),
+        radial-gradient(circle at 100% 43%, #f7fff0 0 15%, transparent 16%);
+      opacity: .78;
+      z-index: 0;
+    }
+
+    .clouds,
+    .music-notes,
+    .hud,
+    .bottom-nav {
+      display: none;
+    }
+
+    .music-notes {
+      position: absolute;
+      inset: 52px 0 auto 0;
+      height: 270px;
+      opacity: .32;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hud {
+      position: absolute;
+      top: 14px;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: 152px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 0 8px;
+      z-index: 3;
+    }
+
+    .player {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 8px;
+      min-height: 62px;
+      padding: 5px 8px 7px 5px;
+      border: 3px solid rgba(255,255,255,.9);
+      border-left: 0;
+      border-radius: 0 18px 18px 0;
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 3px 0 rgba(45,37,55,.24), inset 0 -5px 0 rgba(173,198,213,.22);
+    }
+
+    .avatar {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      border: 3px solid var(--ink);
+      border-radius: 50%;
+      background: linear-gradient(145deg, #dd8fff, #fff0ff 62%, #91ffc9);
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.45);
+    }
+
+    .avatar::before,
+    .avatar::after {
+      content: "";
+      position: absolute;
+      top: 20px;
+      width: 5px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ink);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.45);
+    }
+
+    .avatar::before { left: 22px; }
+    .avatar::after { left: 33px; }
+
+    .avatar span {
+      position: absolute;
+      right: 8px;
+      bottom: 13px;
+      width: 13px;
+      height: 4px;
+      border-radius: 8px;
+      background: #f59db8;
+      transform: rotate(8deg);
+    }
+
+    .player-meta {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+      align-content: center;
+    }
+
+    .name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0;
+    }
+
+    .level {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 5px;
+      align-items: center;
+      font-weight: 900;
+      font-size: 13px;
+      color: #a66b18;
+    }
+
+    .mini-bar {
+      height: 8px;
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      background: #2c2130;
+      overflow: hidden;
+    }
+
+    .mini-bar i {
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #ffe46d, #ffb344);
+    }
+
+    .power {
+      grid-column: 1 / -1;
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 92px;
+      padding: 2px 8px 2px 4px;
+      border-radius: 16px;
+      background: rgba(255,241,216,.92);
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 1000;
+      color: #fff;
+      text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink);
+    }
+
+    .power-icon {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #ff9f55;
+      border: 2px solid var(--ink);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 3px #ffe39b;
+    }
+
+    .resource-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 9px;
+    }
+
+    .resource {
+      position: relative;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      min-width: 0;
+      padding: 0 8px 0 30px;
+      border: 3px solid rgba(255,255,255,.88);
+      border-radius: 18px;
+      background: rgba(255,255,255,.86);
+      color: #33293d;
+      font-weight: 1000;
+      font-size: clamp(16px, 4.6vw, 20px);
+      box-shadow: 0 3px 0 rgba(45,37,55,.18);
+    }
+
+    .resource svg {
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      width: 38px;
+      height: 38px;
+      transform: translateY(-50%);
+      filter: drop-shadow(1px 2px 0 rgba(44,33,48,.35));
+    }
+
+    .plus {
+      position: absolute;
+      right: -4px;
+      bottom: -5px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff8cf;
+      border: 2px solid rgba(44,33,48,.72);
+      color: #7b44d8;
+      font-size: 15px;
+      line-height: 1;
+      font-weight: 1000;
+    }
+
+    .hud-entry {
+      position: absolute;
+      top: 176px;
+      right: 18px;
+      z-index: 2;
+      width: 54px;
+      height: 58px;
+      border: 4px solid var(--ink);
+      border-radius: 17px;
+      background: linear-gradient(180deg, #dffcff, #8bdfff 45%, #6b41c8 46%, #8f5bf1);
+      box-shadow: 0 5px 0 #1b1830, 0 0 0 4px rgba(255,255,255,.55), 0 0 22px rgba(123,217,255,.72);
+      display: grid;
+      place-items: center;
+      animation: pulse-entry 1.8s ease-in-out infinite;
+    }
+
+    .hud-entry::after {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: -8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fffb88;
+      border: 3px solid var(--ink);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.55);
+    }
+
+    .hud-entry svg {
+      width: 40px;
+      height: 40px;
+      filter: drop-shadow(1px 2px 0 rgba(44,33,48,.55));
+    }
+
+    @keyframes pulse-entry {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-3px) scale(1.035); }
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: -3px;
+      height: 93px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: end;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .nav-item {
+      height: 72px;
+      border: 4px solid var(--ink);
+      border-bottom: 0;
+      border-radius: 27px 27px 0 0;
+      background: linear-gradient(180deg, #7b55d9, #5e34a4);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 5px 0 rgba(255,255,255,.2);
+    }
+
+    .nav-item.is-active {
+      height: 92px;
+      background: linear-gradient(180deg, #ffe985, #ffc144);
+    }
+
+    .nav-item svg {
+      width: 48px;
+      height: 48px;
+      filter: drop-shadow(1px 3px 0 rgba(44,33,48,.45));
+    }
+
+    .shade {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 10, 18, .58);
+      z-index: 5;
+    }
+
+    .shade.is-hidden,
+    .event-modal.is-hidden {
+      display: none;
+    }
+
+    .event-modal {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: clamp(78px, 11svh, 102px);
+      bottom: clamp(78px, 7svh, 88px);
+      z-index: 6;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      padding: 12px 12px 14px;
+      border: 5px solid var(--ink);
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.25) 9%, transparent 10%),
+        linear-gradient(180deg, #fff9ea, #f1e5cf);
+      box-shadow:
+        0 10px 0 rgba(18,13,27,.96),
+        0 0 0 5px rgba(255,255,255,.36),
+        inset 0 -8px 0 rgba(184,157,120,.16);
+    }
+
+    .event-modal::before,
+    .event-modal::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      inset: 15px;
+      border-radius: 27px;
+      border: 2px dashed rgba(142,113,91,.22);
+    }
+
+    .modal-head {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      padding-top: 2px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--ink);
+      border-radius: 50%;
+      background: linear-gradient(180deg, #9a65ff, #6732b6);
+      box-shadow: 0 4px 0 #21152c, inset 0 4px 0 rgba(255,255,255,.28);
+      color: white;
+      cursor: pointer;
+    }
+
+    .close-btn svg {
+      width: 27px;
+      height: 27px;
+      stroke: #fffde9;
+      stroke-width: 5;
+      filter: drop-shadow(2px 2px 0 rgba(44,33,48,.8));
+    }
+
+    .title-ribbon {
+      position: relative;
+      width: min(296px, 82%);
+      min-height: 47px;
+      display: grid;
+      place-items: center;
+      padding: 6px 24px;
+      border: 4px solid var(--ink);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffc96b, #ed9f3f);
+      color: #fff;
+      font-weight: 1000;
+      font-size: clamp(25px, 7vw, 32px);
+      line-height: 1;
+      text-align: center;
+      text-shadow: 3px 0 var(--ink), -3px 0 var(--ink), 0 3px var(--ink), 0 -3px var(--ink);
+      box-shadow: inset 0 5px 0 rgba(255,255,255,.25), 0 5px 0 rgba(75,45,30,.42);
+    }
+
+    .title-ribbon::before,
+    .title-ribbon::after {
+      content: "";
+      position: absolute;
+      top: 14px;
+      width: 42px;
+      height: 30px;
+      z-index: -1;
+      border: 4px solid var(--ink);
+      background: #de8840;
+    }
+
+    .title-ribbon::before {
+      left: -33px;
+      border-radius: 12px 0 0 12px;
+      transform: skewY(-15deg);
+    }
+
+    .title-ribbon::after {
+      right: -33px;
+      border-radius: 0 12px 12px 0;
+      transform: skewY(15deg);
+    }
+
+    .count-row {
+      display: inline-grid;
+      grid-template-columns: auto auto;
+      gap: 8px;
+      align-items: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      text-shadow: 1px 0 var(--ink), -1px 0 var(--ink), 0 1px var(--ink), 0 -1px var(--ink);
+    }
+
+    .timer {
+      min-width: 112px;
+      padding: 2px 10px 3px;
+      border: 3px solid #214861;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #142635, #0c1724);
+      color: #9deeff;
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 0 8px rgba(98,219,255,.85);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.16), 0 0 14px rgba(112,225,255,.2);
+    }
+
+    .modal-body {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 9px;
+      min-height: 0;
+    }
+
+    .puzzle-card {
+      position: relative;
+      min-height: 0;
+      padding: 8px;
+      border: 4px solid var(--ink);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.22), transparent 16%),
+        linear-gradient(180deg, #aeeaf7, #678ab5 72%, #445069);
+      box-shadow: inset 0 -6px 0 rgba(34,39,67,.22), 0 5px 0 rgba(33,22,38,.48);
+      overflow: hidden;
+    }
+
+    .puzzle-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 16% 18%, rgba(255,255,255,.8) 0 3px, transparent 4px),
+        radial-gradient(circle at 76% 24%, rgba(255,255,255,.7) 0 2px, transparent 3px),
+        radial-gradient(circle at 57% 63%, rgba(255,255,255,.6) 0 2px, transparent 3px),
+        linear-gradient(180deg, rgba(246,255,255,.45), transparent 26%, rgba(7,17,36,.35));
+      opacity: .86;
+    }
+
+    .scene-wrap {
+      position: relative;
+      height: 100%;
+      min-height: 270px;
+      border: 3px solid rgba(36,28,43,.85);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #162033;
+    }
+
+    .room-scene {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: grayscale(var(--gray, .72)) saturate(var(--sat, .72)) brightness(var(--bright, .72));
+      transition: filter .28s ease;
+      display: none;
+    }
+
+    .puzzle-stage-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: opacity .18s ease;
+    }
+
+    .frost-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 44%, transparent 0 48%, rgba(234,255,255,.36) 62%, rgba(13,21,36,.42) 100%),
+        linear-gradient(90deg, rgba(244,255,255,.32), transparent 11% 88%, rgba(244,255,255,.36));
+      mix-blend-mode: screen;
+    }
+
+    .jigsaw-pieces {
+      position: absolute;
+      inset: 0;
+      display: none;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+
+    .jigsaw-pieces::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, transparent calc(16.666% - 1px), rgba(232,255,255,.34) calc(16.666% - 1px) calc(16.666% + 1px), transparent calc(16.666% + 1px)),
+        linear-gradient(90deg, transparent calc(33.333% - 1px), rgba(232,255,255,.3) calc(33.333% - 1px) calc(33.333% + 1px), transparent calc(33.333% + 1px)),
+        linear-gradient(90deg, transparent calc(50% - 1px), rgba(232,255,255,.34) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+        linear-gradient(90deg, transparent calc(66.666% - 1px), rgba(232,255,255,.3) calc(66.666% - 1px) calc(66.666% + 1px), transparent calc(66.666% + 1px)),
+        linear-gradient(90deg, transparent calc(83.333% - 1px), rgba(232,255,255,.34) calc(83.333% - 1px) calc(83.333% + 1px), transparent calc(83.333% + 1px)),
+        linear-gradient(180deg, transparent calc(25% - 1px), rgba(232,255,255,.34) calc(25% - 1px) calc(25% + 1px), transparent calc(25% + 1px)),
+        linear-gradient(180deg, transparent calc(50% - 1px), rgba(232,255,255,.34) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+        linear-gradient(180deg, transparent calc(75% - 1px), rgba(232,255,255,.34) calc(75% - 1px) calc(75% + 1px), transparent calc(75% + 1px));
+    }
+
+    .piece {
+      position: relative;
+      opacity: 0;
+      transform: scale(.9);
+      transition: opacity .24s ease, transform .24s ease, background .24s ease;
+    }
+
+    .piece.is-hidden {
+      opacity: 1;
+      transform: scale(1);
+      background:
+        radial-gradient(circle at 50% -8px, transparent 0 13px, rgba(14,18,28,.95) 14px),
+        linear-gradient(145deg, rgba(36,42,62,.96), rgba(6,9,18,.96));
+      border: 1px solid rgba(205,238,255,.15);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.04);
+    }
+
+    .piece.is-hidden::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      right: -11px;
+      top: calc(50% - 10px);
+      border-radius: 50%;
+      background: rgba(8,11,20,.94);
+      box-shadow: inset 0 0 0 1px rgba(205,238,255,.12);
+    }
+
+    .piece.is-hidden:nth-child(even)::before {
+      left: -11px;
+      right: auto;
+    }
+
+    .piece.is-hidden:nth-child(3n)::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: calc(50% - 10px);
+      bottom: -11px;
+      border-radius: 50%;
+      background: rgba(8,11,20,.94);
+      box-shadow: inset 0 0 0 1px rgba(205,238,255,.12);
+    }
+
+    .stage-badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      min-width: 72px;
+      padding: 5px 9px;
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      background: rgba(255,255,255,.82);
+      font-size: 17px;
+      font-weight: 1000;
+      color: #fff;
+      text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink);
+      box-shadow: inset 0 -4px 0 rgba(95,118,142,.18);
+      z-index: 2;
+    }
+
+    .stage-tabs {
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      bottom: 9px;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 5px;
+      padding: 5px;
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      background: rgba(13,19,30,.62);
+      backdrop-filter: blur(4px);
+    }
+
+    .stage-tab {
+      position: relative;
+      min-width: 0;
+      height: 34px;
+      border: 3px solid rgba(30,24,35,.95);
+      border-radius: 13px;
+      background: linear-gradient(180deg, #f2f7ff, #9acde3);
+      color: #fff;
+      font-weight: 1000;
+      font-size: 17px;
+      text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.38), 0 3px 0 rgba(13,11,19,.45);
+      cursor: pointer;
+    }
+
+    .stage-tab.is-current {
+      background: linear-gradient(180deg, #fff88b, #ffc04b);
+      box-shadow: 0 0 12px var(--warm-glow), inset 0 3px 0 rgba(255,255,255,.45), 0 3px 0 rgba(13,11,19,.45);
+    }
+
+    .stage-tab.is-done::after {
+      content: "";
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #68f779;
+      border: 2px solid var(--ink);
+    }
+
+    .furniture-light {
+      opacity: 0;
+      transition: opacity .24s ease, filter .24s ease, transform .24s ease;
+    }
+
+    .furniture-light.is-lit {
+      opacity: 1;
+      filter: drop-shadow(0 0 12px rgba(255, 203, 82, .82));
+    }
+
+    .reward-panel {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 9px;
+      border: 4px solid var(--ink);
+      border-radius: 22px;
+      background: linear-gradient(180deg, #8f4b70, #5a263d);
+      box-shadow: inset 0 5px 0 rgba(255,255,255,.16), 0 5px 0 rgba(31,21,34,.42);
+    }
+
+    .reward-slot {
+      position: relative;
+      min-height: 76px;
+      display: grid;
+      grid-template-rows: 46px auto;
+      place-items: center;
+      gap: 2px;
+      padding: 6px 4px 5px;
+      border: 3px solid rgba(41,31,47,.94);
+      border-radius: 17px;
+      background: linear-gradient(180deg, #9ee9ff, #4aa8d4);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      text-align: center;
+      text-shadow: 1px 0 var(--ink), -1px 0 var(--ink), 0 1px var(--ink), 0 -1px var(--ink);
+      box-shadow: inset 0 4px 0 rgba(255,255,255,.42), inset 0 -5px 0 rgba(35,86,138,.28);
+      overflow: hidden;
+    }
+
+    .reward-slot::before {
+      content: "";
+      position: absolute;
+      inset: 6px 8px 28px;
+      border-radius: 19px 19px 13px 13px;
+      background: radial-gradient(circle at 50% 35%, rgba(235,255,255,.92), rgba(101,204,255,.7) 66%, rgba(32,125,189,.62));
+      opacity: .9;
+    }
+
+    .reward-slot svg {
+      position: relative;
+      z-index: 1;
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(1px 2px 0 rgba(44,33,48,.72));
+      transition: filter .24s ease, transform .24s ease;
+    }
+
+    .reward-slot b {
+      position: relative;
+      z-index: 1;
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .reward-slot.is-better {
+      background: linear-gradient(180deg, #b9f0ff, #6ad06e);
+    }
+
+    .reward-slot.is-best {
+      background: linear-gradient(180deg, #fff4a8, #8bdfff);
+    }
+
+    .reward-slot.is-current {
+      box-shadow: 0 0 18px var(--warm-glow), inset 0 4px 0 rgba(255,255,255,.42), inset 0 -5px 0 rgba(35,86,138,.28);
+      transform: translateY(-2px);
+    }
+
+    .reward-slot small {
+      position: absolute;
+      right: 4px;
+      bottom: 2px;
+      z-index: 2;
+      font-size: 12px;
+      font-weight: 1000;
+      color: #fff;
+      text-shadow: 1px 0 var(--ink), -1px 0 var(--ink), 0 1px var(--ink), 0 -1px var(--ink);
+    }
+
+    .modal-foot {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .progress-pill {
+      justify-self: start;
+      min-width: 94px;
+      padding: 6px 10px;
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #e8f8ff, #a7cbde);
+      color: #fff;
+      font-weight: 1000;
+      font-size: 15px;
+      text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.35), 0 3px 0 rgba(41,31,47,.35);
+    }
+
+    .action-btn {
+      min-width: 138px;
+      height: 50px;
+      border: 4px solid var(--ink);
+      border-radius: 19px;
+      background: linear-gradient(180deg, #d4cabc, #89806f);
+      color: #fff;
+      font-size: 26px;
+      line-height: 1;
+      font-weight: 1000;
+      text-shadow: 3px 0 var(--ink), -3px 0 var(--ink), 0 3px var(--ink), 0 -3px var(--ink);
+      box-shadow: inset 0 5px 0 rgba(255,255,255,.22), 0 5px 0 rgba(31,23,36,.58);
+      cursor: pointer;
+      transition: transform .18s ease, filter .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .action-btn:active {
+      transform: translateY(3px);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.2), 0 2px 0 rgba(31,23,36,.58);
+    }
+
+    .action-btn.is-active {
+      background: linear-gradient(180deg, #fff173, #ffb63d 48%, #f08f2b);
+      box-shadow: 0 0 22px var(--warm-glow), inset 0 5px 0 rgba(255,255,255,.32), 0 5px 0 rgba(31,23,36,.58);
+    }
+
+    .hint-pill {
+      justify-self: end;
+      display: inline-grid;
+      grid-template-columns: 24px auto;
+      gap: 5px;
+      align-items: center;
+      max-width: 108px;
+      padding: 5px 8px;
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #9c67ff, #6b39bd);
+      color: #fff;
+      font-weight: 1000;
+      font-size: 14px;
+      white-space: nowrap;
+      text-shadow: 1px 0 var(--ink), -1px 0 var(--ink), 0 1px var(--ink), 0 -1px var(--ink);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.25), 0 3px 0 rgba(41,31,47,.38);
+    }
+
+    .hint-pill svg {
+      width: 24px;
+      height: 24px;
+      filter: drop-shadow(1px 1px 0 rgba(44,33,48,.65));
+    }
+
+    .snow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 7;
+    }
+
+    .snow i {
+      position: absolute;
+      top: -20px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 0 8px rgba(182,238,255,.8);
+      animation: fall linear infinite;
+    }
+
+    .snow i:nth-child(1) { left: 9%; animation-duration: 8s; animation-delay: -4s; }
+    .snow i:nth-child(2) { left: 22%; animation-duration: 10s; animation-delay: -7s; }
+    .snow i:nth-child(3) { left: 39%; animation-duration: 7s; animation-delay: -2s; }
+    .snow i:nth-child(4) { left: 51%; animation-duration: 11s; animation-delay: -6s; }
+    .snow i:nth-child(5) { left: 67%; animation-duration: 8s; animation-delay: -5s; }
+    .snow i:nth-child(6) { left: 83%; animation-duration: 9s; animation-delay: -3s; }
+    .snow i:nth-child(7) { left: 94%; animation-duration: 12s; animation-delay: -9s; }
+
+    @keyframes fall {
+      0% { transform: translate3d(0, -20px, 0); opacity: 0; }
+      10% { opacity: .95; }
+      100% { transform: translate3d(-30px, 106vh, 0); opacity: 0; }
+    }
+
+    .phone > .clouds,
+    .phone > .music-notes,
+    .phone > .hud,
+    .phone > .bottom-nav {
+      display: none !important;
+    }
+
+    @media (max-height: 780px) {
+      .event-modal {
+        top: 72px;
+        bottom: 62px;
+        gap: 7px;
+        padding: 9px 10px 11px;
+      }
+
+      .scene-wrap {
+        min-height: 230px;
+      }
+
+      .reward-slot {
+        min-height: 64px;
+        grid-template-rows: 38px auto;
+      }
+
+      .reward-slot svg {
+        width: 37px;
+        height: 37px;
+      }
+
+      .title-ribbon {
+        min-height: 40px;
+      }
+
+      .action-btn {
+        height: 45px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .hud {
+        grid-template-columns: 142px 1fr;
+        padding: 0 5px;
+      }
+
+      .resource-row {
+        gap: 5px;
+      }
+
+      .resource {
+        padding-right: 5px;
+        font-size: 15px;
+      }
+
+      .modal-foot {
+        grid-template-columns: 1fr auto;
+      }
+
+      .hint-pill {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="暖火拼圖活動 prototype">
+    <img class="main-bg" src="assets/main-screen.jpg" alt="遊戲主畫面">
+    <button class="screen-hotspot" type="button" aria-label="打開活動"></button>
+    <div class="clouds"></div>
+    <svg class="music-notes" viewBox="0 0 430 270" aria-hidden="true">
+      <g fill="none" stroke="#4b9fc2" stroke-linecap="round" stroke-linejoin="round" stroke-width="7">
+        <path d="M74 42v75c0 15-27 15-27 0s27-15 27 0" />
+        <path d="M74 42l45 14v76c0 15-27 15-27 0s27-15 27 0" />
+        <path d="M294 18v83c0 15-28 16-28 0s28-15 28 0" />
+        <path d="M294 18l43 15" />
+        <path d="M178 26l14 28 31 5-23 22 6 31-28-15-28 15 5-31-22-22 31-5z" />
+        <path d="M350 118l11 22 25 4-18 18 4 25-22-12-22 12 4-25-18-18 25-4z" />
+      </g>
+    </svg>
+
+    <section class="hud" aria-label="遊戲狀態列">
+      <div class="player">
+        <div class="avatar"><span></span></div>
+        <div class="player-meta">
+          <div class="name">pGfwZTV1fcDdV2O</div>
+          <div class="level"><span>21</span><span class="mini-bar"><i></i></span></div>
+        </div>
+        <div class="power"><span class="power-icon">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path fill="#fff4b5" stroke="#2c2130" stroke-width="2.6" stroke-linejoin="round" d="M18 3 6 18h9l-2 11 13-17h-9z"/>
+          </svg>
+        </span>1.9M</div>
+      </div>
+      <div class="resource-row">
+        <div class="resource">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <path fill="#7df077" stroke="#2c2130" stroke-width="3" stroke-linejoin="round" d="M26 3 8 24h12l-2 17 19-25H25z"/>
+          </svg>
+          90/90<span class="plus">+</span>
+        </div>
+        <div class="resource">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <path fill="#9feeff" stroke="#2c2130" stroke-width="3" stroke-linejoin="round" d="m22 3 13 10-4 22-12 6L8 27l5-19z"/>
+            <path fill="#e7ffff" d="m22 7 8 7-10 4-7-8z"/>
+          </svg>
+          18.3K<span class="plus">+</span>
+        </div>
+        <div class="resource">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <circle cx="22" cy="22" r="17" fill="#ffd756" stroke="#2c2130" stroke-width="3"/>
+            <path fill="#e98b2f" stroke="#a46321" stroke-width="2" d="M12 21c9-10 17-2 22-8-1 10-8 17-18 18 5-4 7-7 8-12-4 4-8 5-12 2z"/>
+          </svg>
+          16.5K<span class="plus">+</span>
+        </div>
+      </div>
+    </section>
+
+    <button class="hud-entry" type="button" aria-label="暖火拼圖入口">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <path fill="#f7ffff" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M29 10c4 7 0 10-5 9-7-2-11 3-10 10h11c4 0 5 7 0 8H14v13h15c0-7 10-7 10 0h13V36c-7 0-7-10 0-10V13H39c0 7-6 7-10-3z"/>
+        <path fill="#8feeff" opacity=".8" d="M20 25h15v9H20zM35 36h12v10H35z"/>
+        <path fill="none" stroke="#2c2130" stroke-width="3" stroke-linecap="round" d="M45 7v12M39 13h12M13 46v10M8 51h10"/>
+      </svg>
+    </button>
+
+    <nav class="bottom-nav" aria-label="遊戲底部選單">
+      <div class="nav-item">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ffd96d" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M18 18h28l5 33H13z"/>
+          <path fill="#ff8f9c" stroke="#2c2130" stroke-width="4" d="M20 18c3-10 21-10 24 0"/>
+        </svg>
+      </div>
+      <div class="nav-item is-active">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#9ee9ff" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M17 45c3-14 8-23 15-31 7 8 12 17 15 31z"/>
+          <path fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" d="M26 41c3-8 5-14 6-21"/>
+        </svg>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ffcf67" stroke="#2c2130" stroke-width="4" d="M32 12c10 0 18 8 18 18S42 50 32 50 14 40 14 30s8-18 18-18z"/>
+          <path fill="#fff2a4" d="M25 19c7-4 17 2 18 10-7-3-14-4-24 1 1-5 2-8 6-11z"/>
+        </svg>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#8ce680" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M32 9c13 8 20 16 21 28-11-3-17 3-21 17-4-14-10-20-21-17C12 25 19 17 32 9z"/>
+        </svg>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ffd76b" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M12 22h40v29H12z"/>
+          <path fill="#ffedb0" stroke="#2c2130" stroke-width="4" d="M18 15h28v13H18z"/>
+          <circle cx="32" cy="37" r="7" fill="#8be2ff" stroke="#2c2130" stroke-width="4"/>
+        </svg>
+      </div>
+    </nav>
+
+    <div class="shade"></div>
+
+    <section class="event-modal" aria-label="暖火拼圖活動彈窗">
+      <header class="modal-head">
+        <button class="close-btn" type="button" aria-label="關閉">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M8 8l16 16M24 8 8 24" fill="none" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="title-ribbon">暖火拼圖</div>
+        <div class="count-row">
+          <span>活動倒數</span>
+          <span class="timer" id="timer">47:59:59</span>
+        </div>
+      </header>
+
+      <div class="modal-body">
+        <div class="puzzle-card">
+          <div class="scene-wrap">
+            <img class="puzzle-stage-image" id="puzzleStageImage" src="assets/puzzle-stages/stage-1.png" alt="拼圖階段畫面">
+            <svg class="room-scene" viewBox="0 0 720 430" preserveAspectRatio="xMidYMid slice" aria-label="寒冬房間拼圖">
+              <defs>
+                <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#d9f4ff"/>
+                  <stop offset=".54" stop-color="#b3d6ed"/>
+                  <stop offset="1" stop-color="#7f91a8"/>
+                </linearGradient>
+                <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#826d66"/>
+                  <stop offset="1" stop-color="#544148"/>
+                </linearGradient>
+                <radialGradient id="coldLight" cx=".5" cy=".46" r=".62">
+                  <stop offset="0" stop-color="#f5ffff" stop-opacity=".9"/>
+                  <stop offset=".58" stop-color="#b7ecff" stop-opacity=".35"/>
+                  <stop offset="1" stop-color="#263549" stop-opacity=".68"/>
+                </radialGradient>
+              </defs>
+
+              <rect width="720" height="430" fill="#21283a"/>
+              <rect x="22" y="18" width="676" height="288" rx="30" fill="url(#wall)" stroke="#2c2130" stroke-width="8"/>
+              <path d="M22 282h676v126H22z" fill="url(#floor)" stroke="#2c2130" stroke-width="8"/>
+
+              <g opacity=".34" fill="none" stroke="#76bad4" stroke-width="8" stroke-linecap="round">
+                <path d="M93 66h84M73 105h142M505 71h104M492 110h128"/>
+                <path d="M242 54c36 28 70 31 108 0M254 92c28 22 54 24 85 0"/>
+              </g>
+
+              <g transform="translate(500 54)">
+                <path d="M0 0h124v92H0z" fill="#b7edff" stroke="#2c2130" stroke-width="7" stroke-linejoin="round"/>
+                <path d="M62 0v92M0 46h124" stroke="#2c2130" stroke-width="6"/>
+                <path d="m24 12 22 18-18 9 27 23-29 14" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity=".78"/>
+                <path d="M125 34c45 14 56 39 65 68-31-17-55-21-85-13 20-18 24-35 20-55z" fill="#effcff" opacity=".75"/>
+                <path d="M7 101c24 3 43 12 64 31" stroke="#e9fbff" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+              </g>
+
+              <g transform="translate(36 190)">
+                <path d="M25 35c4-42 132-42 142 0l15 80H8z" fill="#9c6a7b" stroke="#2c2130" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M35 54h126v60H35z" fill="#c58a8b" stroke="#2c2130" stroke-width="7"/>
+                <path d="M22 113h168v31H22z" fill="#684555" stroke="#2c2130" stroke-width="7"/>
+                <path d="M52 56c24-14 73-14 92 0" fill="none" stroke="#f6b7ae" stroke-width="9" stroke-linecap="round" opacity=".55"/>
+              </g>
+
+              <g class="furniture-light" data-unlock-stage="6" transform="translate(36 190)">
+                <path d="M42 63c31-15 82-13 120 2v40H42z" fill="#ffe7a2" stroke="#2c2130" stroke-width="6" stroke-linejoin="round"/>
+                <path d="M59 70c25 10 53 15 86 1" fill="none" stroke="#ff9cd1" stroke-width="8" stroke-linecap="round"/>
+                <path d="M56 93h94" stroke="#8bdfff" stroke-width="7" stroke-linecap="round"/>
+              </g>
+
+              <g transform="translate(490 237)">
+                <path d="M5 55h168v64H5z" fill="#9bc8df" stroke="#2c2130" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M23 16h132l18 52H5z" fill="#dff7ff" stroke="#2c2130" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M34 20c31 30 69 39 112 0" fill="none" stroke="#98c7d9" stroke-width="8"/>
+                <path d="M19 88h143" stroke="#2c2130" stroke-width="6"/>
+              </g>
+
+              <g transform="translate(296 118)">
+                <path d="M16 79c7-46 90-46 98 0l7 77H8z" fill="#7b5c5d" stroke="#2c2130" stroke-width="8" stroke-linejoin="round"/>
+                <rect x="25" y="92" width="79" height="61" rx="14" fill="#292536" stroke="#2c2130" stroke-width="7"/>
+                <path d="M38 79c11-21 45-21 58 0" fill="none" stroke="#c2b2a1" stroke-width="8" stroke-linecap="round"/>
+                <path d="M62 144c-7-9-2-18 6-26 0 9 10 12 10 21 0 8-6 13-16 5z" fill="#ff9c4f" opacity=".18"/>
+              </g>
+
+              <g class="furniture-light" data-unlock-stage="2" transform="translate(236 300)">
+                <ellipse cx="44" cy="34" rx="64" ry="25" fill="#ffcf57" opacity=".22"/>
+                <path d="M14 42 72 15M25 54 87 26" stroke="#2c2130" stroke-width="10" stroke-linecap="round"/>
+                <path d="M14 42 72 15M25 54 87 26" stroke="#9b5c2d" stroke-width="6" stroke-linecap="round"/>
+                <path d="M51 30c-7-11 1-18 10-29 0 11 12 16 11 29-1 14-21 17-28 4 3 2 6 1 7-4z" fill="#ffef78" stroke="#2c2130" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M58 34c-4-7 1-12 6-19 0 7 7 10 6 17 0 8-12 9-16 2 2 1 3 1 4 0z" fill="#ff8e48"/>
+              </g>
+
+              <g class="furniture-light" data-unlock-stage="4" transform="translate(296 118)">
+                <ellipse cx="64" cy="122" rx="86" ry="62" fill="#ffd45e" opacity=".24"/>
+                <rect x="33" y="100" width="62" height="44" rx="10" fill="#ffeaa2" opacity=".42"/>
+                <path d="M61 145c-9-13-1-25 10-39 0 14 15 20 14 36-1 17-25 20-34 5 4 2 8 2 10-2z" fill="#ffeb63" stroke="#2c2130" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M69 145c-4-7 1-13 7-21 0 8 8 11 7 19 0 9-12 10-17 3 2 1 3 1 3-1z" fill="#ff8747"/>
+              </g>
+
+              <g transform="translate(268 218)">
+                <ellipse cx="92" cy="142" rx="118" ry="34" fill="#2e2837" opacity=".25"/>
+                <path d="M89 26c-18 9-33 28-40 49-15 0-27 11-27 27 0 15 11 26 26 27 10 30 34 48 71 48 53 0 85-32 85-78 0-45-36-81-85-81-11 0-21 3-30 8z" fill="#ffe1f3" stroke="#2c2130" stroke-width="8"/>
+                <path d="M86 30c13 9 23 22 25 39-17-4-31-2-45 7 1-22 8-37 20-46z" fill="#eebce1" opacity=".78"/>
+                <path d="M70 88c-12 13-17 29-13 47" fill="none" stroke="#d29ac2" stroke-width="8" stroke-linecap="round"/>
+                <path d="M118 91c-15 22-32 38-60 47" fill="none" stroke="#d29ac2" stroke-width="8" stroke-linecap="round"/>
+                <circle cx="114" cy="77" r="8" fill="#2c2130"/>
+                <circle cx="145" cy="80" r="8" fill="#2c2130"/>
+                <circle cx="117" cy="73" r="3" fill="#fff"/>
+                <circle cx="148" cy="76" r="3" fill="#fff"/>
+                <path d="M44 108c-20-4-31 5-36 16 15-1 26 5 33 18" fill="#9ee5ff" stroke="#2c2130" stroke-width="7" stroke-linejoin="round"/>
+                <path d="M13 126c11 7 20 14 28 23" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity=".66"/>
+                <path d="M202 103c25-8 39 1 49 19-21-2-35 5-43 24" fill="#c4ebef" stroke="#2c2130" stroke-width="7" stroke-linejoin="round"/>
+                <path d="M220 90c-8 5-12 16-7 26M241 82c-8 5-12 16-7 26" stroke="#dff8ff" stroke-width="5" stroke-linecap="round"/>
+              </g>
+
+              <g fill="none" stroke="#e9fbff" stroke-linecap="round" opacity=".8">
+                <path d="M230 166c-29-28-43-56-44-88" stroke-width="7"/>
+                <path d="M214 164c-21-14-37-18-58-14" stroke-width="6"/>
+                <path d="M439 179c24-23 36-49 37-79" stroke-width="7"/>
+                <path d="M458 180c20-16 36-21 59-16" stroke-width="6"/>
+              </g>
+
+              <rect width="720" height="430" fill="url(#coldLight)" pointer-events="none"/>
+              <g fill="#ffffff" opacity=".75">
+                <circle cx="84" cy="91" r="4"/>
+                <circle cx="654" cy="128" r="5"/>
+                <circle cx="561" cy="183" r="3"/>
+                <circle cx="196" cy="260" r="4"/>
+                <circle cx="370" cy="57" r="3"/>
+                <circle cx="462" cy="319" r="4"/>
+              </g>
+            </svg>
+
+            <div class="frost-vignette"></div>
+            <div class="jigsaw-pieces" id="pieces" aria-hidden="true"></div>
+            <div class="stage-badge" id="stageBadge">10%</div>
+            <div class="stage-tabs" id="stageTabs" aria-label="拼圖階段"></div>
+          </div>
+        </div>
+
+        <div class="reward-panel" aria-label="獎勵進度">
+          <div class="reward-slot" data-reward="1">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="22" fill="#ffd756" stroke="#2c2130" stroke-width="4"/>
+              <circle cx="32" cy="32" r="14" fill="#ffb33f" stroke="#d27a25" stroke-width="3"/>
+              <path fill="#ffeaa2" d="M24 30c9-10 17-2 23-8-2 12-11 20-24 21 6-4 9-8 11-15-4 4-7 5-10 2z"/>
+            </svg>
+            <b>金幣</b>
+            <small>x7935</small>
+          </div>
+          <div class="reward-slot" data-reward="2">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path fill="#9eeeff" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="m32 5 17 14-6 31-16 8-14-19 7-28z"/>
+              <path fill="#e9ffff" d="m32 10 10 10-13 5-9-10z"/>
+              <path fill="none" stroke="#4dbce8" stroke-width="4" stroke-linecap="round" d="M29 25 27 54M42 21 31 58"/>
+            </svg>
+            <b>冰晶</b>
+            <small>x1915</small>
+          </div>
+          <div class="reward-slot is-better" data-reward="3">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path fill="#7fd07a" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M10 25h44v29H10z"/>
+              <path fill="#9ce08c" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M15 15h34l5 13H10z"/>
+              <path fill="#f5c166" stroke="#2c2130" stroke-width="4" d="M25 25h14v29H25z"/>
+              <path fill="#fff0a6" d="M18 18h28l2 6H16z"/>
+            </svg>
+            <b>補給箱</b>
+            <small>x34</small>
+          </div>
+          <div class="reward-slot is-best" data-reward="4">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path fill="#fff0b7" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M32 4 43 23l19 9-19 9-11 19-11-19-19-9 19-9z"/>
+              <circle cx="32" cy="32" r="8" fill="#f3a9ff" stroke="#2c2130" stroke-width="4"/>
+              <path fill="#ffffff" opacity=".75" d="m32 10 6 14 14 8-14 8-6 14-6-14-14-8 14-8z"/>
+            </svg>
+            <b>星砂</b>
+            <small>x34</small>
+          </div>
+        </div>
+      </div>
+
+      <footer class="modal-foot">
+        <div class="progress-pill" id="progressText">1/6</div>
+        <button class="action-btn" id="actionBtn" type="button">前往</button>
+      </footer>
+    </section>
+
+    <div class="snow" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </main>
+
+  <script>
+    const revealOrder = [8, 9, 14, 15, 2, 7, 10, 13, 16, 20, 3, 4, 6, 11, 17, 21, 1, 5, 12, 18, 19, 0, 22, 23];
+    const revealCounts = [2, 6, 11, 16, 21, 24];
+    const stageLabels = ["10%", "30%", "50%", "70%", "90%", "100%"];
+    const stageImages = [
+      "assets/puzzle-stages/stage-1.png",
+      "assets/puzzle-stages/stage-2.png",
+      "assets/puzzle-stages/stage-3.png",
+      "assets/puzzle-stages/stage-4.png",
+      "assets/puzzle-stages/stage-5.png",
+      "assets/puzzle-stages/stage-6.png"
+    ];
+    const stageFilters = [
+      { gray: .96, sat: .42, bright: .42 },
+      { gray: .86, sat: .55, bright: .56 },
+      { gray: .74, sat: .68, bright: .70 },
+      { gray: .58, sat: .82, bright: .82 },
+      { gray: .34, sat: .96, bright: .95 },
+      { gray: .16, sat: 1.08, bright: 1.05 }
+    ];
+
+    const piecesEl = document.getElementById("pieces");
+    const tabsEl = document.getElementById("stageTabs");
+    const badgeEl = document.getElementById("stageBadge");
+    const progressEl = document.getElementById("progressText");
+    const actionBtn = document.getElementById("actionBtn");
+    const modal = document.querySelector(".event-modal");
+    const shade = document.querySelector(".shade");
+    const closeBtn = document.querySelector(".close-btn");
+    const hudEntry = document.querySelector(".hud-entry");
+    const screenHotspot = document.querySelector(".screen-hotspot");
+    const scene = document.querySelector(".room-scene");
+    const puzzleStageImage = document.getElementById("puzzleStageImage");
+    const rewardSlots = [...document.querySelectorAll(".reward-slot")];
+    const furnitureLights = [...document.querySelectorAll(".furniture-light")];
+    const tabButtons = [];
+    const pieceNodes = [];
+    let stage = 1;
+
+    for (let i = 0; i < 24; i += 1) {
+      const node = document.createElement("span");
+      node.className = "piece is-hidden";
+      piecesEl.appendChild(node);
+      pieceNodes.push(node);
+    }
+
+    for (let i = 1; i <= 6; i += 1) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "stage-tab";
+      btn.textContent = String(i);
+      btn.setAttribute("aria-label", `階段 ${i}`);
+      btn.addEventListener("click", () => setStage(i));
+      tabsEl.appendChild(btn);
+      tabButtons.push(btn);
+    }
+
+    function setStage(nextStage) {
+      stage = Math.max(1, Math.min(6, nextStage));
+      const count = revealCounts[stage - 1];
+      const visibleSet = new Set(revealOrder.slice(0, count));
+
+      pieceNodes.forEach((piece, index) => {
+        piece.classList.toggle("is-hidden", !visibleSet.has(index));
+      });
+
+      tabButtons.forEach((btn, index) => {
+        btn.classList.toggle("is-current", index === stage - 1);
+        btn.classList.toggle("is-done", index < stage - 1);
+      });
+
+      const currentRewardIndex = Math.min(3, Math.floor((stage - 1) / 2));
+      rewardSlots.forEach((slot, index) => {
+        slot.classList.toggle("is-current", index === currentRewardIndex);
+      });
+
+      furnitureLights.forEach((item) => {
+        item.classList.toggle("is-lit", stage >= Number(item.dataset.unlockStage));
+      });
+
+      const filter = stageFilters[stage - 1];
+      scene.style.setProperty("--gray", filter.gray);
+      scene.style.setProperty("--sat", filter.sat);
+      scene.style.setProperty("--bright", filter.bright);
+      puzzleStageImage.src = stageImages[stage - 1];
+      badgeEl.textContent = stageLabels[stage - 1];
+      progressEl.textContent = `${stage}/6`;
+      actionBtn.textContent = stage >= 6 ? "點亮" : "前往";
+      actionBtn.classList.toggle("is-active", stage >= 6);
+    }
+
+    actionBtn.addEventListener("click", () => {
+      if (stage < 6) {
+        setStage(stage + 1);
+      } else {
+        actionBtn.textContent = "已點亮";
+        actionBtn.classList.add("is-active");
+        furnitureLights.forEach((item) => item.classList.add("is-lit"));
+      }
+    });
+
+    closeBtn.addEventListener("click", () => {
+      modal.classList.add("is-hidden");
+      shade.classList.add("is-hidden");
+    });
+
+    hudEntry.addEventListener("click", () => {
+      modal.classList.remove("is-hidden");
+      shade.classList.remove("is-hidden");
+    });
+
+    screenHotspot.addEventListener("click", () => {
+      modal.classList.remove("is-hidden");
+      shade.classList.remove("is-hidden");
+    });
+
+    const timer = document.getElementById("timer");
+    let seconds = 47 * 3600 + 59 * 60 + 59;
+    setInterval(() => {
+      seconds = Math.max(0, seconds - 1);
+      const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+      const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+      const s = String(seconds % 60).padStart(2, "0");
+      timer.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+
+    setStage(1);
+  </script>
+</body>
+</html>
