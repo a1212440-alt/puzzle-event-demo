@@ -939,6 +939,334 @@
       display: none !important;
     }
 
+    .event-modal {
+      left: 8px;
+      right: 8px;
+      top: 8px;
+      bottom: 8px;
+      gap: 8px;
+      padding: 12px 13px 14px;
+      border: 6px solid #21162d;
+      border-radius: 32px;
+      background:
+        radial-gradient(circle at 16% 10%, rgba(255, 240, 188, .36), transparent 26%),
+        radial-gradient(circle at 86% 88%, rgba(255, 227, 146, .24), transparent 24%),
+        linear-gradient(180deg, #fff2d8 0%, #ead1a9 100%);
+      box-shadow:
+        0 0 0 5px #563c79,
+        0 12px 0 rgba(20, 13, 27, .96),
+        inset 0 0 0 3px rgba(124, 78, 49, .24),
+        inset 0 -12px 0 rgba(129, 77, 47, .14);
+    }
+
+    .event-modal::before {
+      inset: 19px 15px;
+      border-radius: 24px;
+      border: 2px dashed rgba(131, 90, 57, .38);
+    }
+
+    .event-modal::after {
+      inset: 0;
+      border: 0;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 12% 5%, #fff4a2 0 2px, transparent 3px),
+        radial-gradient(circle at 74% 4%, #fff4a2 0 2px, transparent 3px),
+        radial-gradient(circle at 92% 18%, #fff4a2 0 2px, transparent 3px),
+        radial-gradient(circle at 20% 94%, #fff4a2 0 3px, transparent 4px),
+        radial-gradient(circle at 82% 92%, #fff4a2 0 2px, transparent 3px);
+      opacity: .95;
+    }
+
+    .modal-head {
+      gap: 7px;
+      padding-top: 0;
+    }
+
+    .close-btn {
+      top: -12px;
+      right: -9px;
+      width: 54px;
+      height: 54px;
+      border-width: 5px;
+      background: linear-gradient(180deg, #a266e8 0%, #6a36a8 100%);
+      box-shadow: 0 5px 0 #251636, inset 0 5px 0 rgba(255,255,255,.26), 0 0 0 3px rgba(255,255,255,.28);
+      z-index: 4;
+    }
+
+    .title-ribbon {
+      width: calc(100% - 44px);
+      min-height: 78px;
+      padding: 8px 54px 10px;
+      border: 5px solid #3a1c12;
+      border-radius: 20px 20px 15px 15px;
+      background:
+        linear-gradient(90deg, rgba(72, 34, 16, .42), transparent 18% 82%, rgba(72, 34, 16, .38)),
+        repeating-linear-gradient(8deg, rgba(255,255,255,.08) 0 10px, transparent 11px 26px),
+        linear-gradient(180deg, #b86c28 0%, #8d471e 52%, #683013 100%);
+      color: #fff5bd;
+      font-size: clamp(36px, 11vw, 52px);
+      text-shadow:
+        4px 0 #3b1b10, -4px 0 #3b1b10, 0 4px #3b1b10, 0 -4px #3b1b10,
+        0 5px 0 rgba(78, 39, 16, .85);
+      box-shadow: inset 0 7px 0 rgba(255,210,132,.32), inset 0 -8px 0 rgba(59,25,10,.28), 0 5px 0 rgba(68,38,22,.65);
+    }
+
+    .title-ribbon::before {
+      left: 13px;
+      top: 14px;
+      width: 44px;
+      height: 48px;
+      border-radius: 8px;
+      border: 4px solid #4a2616;
+      background:
+        linear-gradient(135deg, transparent 0 18%, #f5e2bd 19% 100%);
+      transform: rotate(-7deg);
+      box-shadow: inset 0 0 0 4px rgba(122,79,43,.22);
+    }
+
+    .title-ribbon::after {
+      right: 14px;
+      top: 23px;
+      width: 37px;
+      height: 37px;
+      border: 0;
+      border-radius: 0 70% 0 70%;
+      background: linear-gradient(135deg, #a5d96e, #4f8b37);
+      transform: rotate(34deg);
+      box-shadow: 13px -9px 0 -7px #d6e77a, 18px 1px 0 -8px #477b31;
+    }
+
+    .count-row {
+      grid-template-columns: auto auto;
+      gap: 6px;
+      padding: 5px 14px;
+      border: 4px solid #241931;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #134e68, #092b42);
+      box-shadow: inset 0 3px 0 rgba(126,241,255,.22), 0 4px 0 rgba(32,21,40,.46);
+      color: #9bf5ff;
+      font-size: 18px;
+    }
+
+    .timer-icon {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #fff3cf;
+      border: 2px solid #4d2f23;
+      color: #4d2f23;
+      text-shadow: none;
+      font-weight: 1000;
+    }
+
+    .timer {
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #83f4ff;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0;
+      box-shadow: none;
+    }
+
+    .event-subtitle {
+      position: relative;
+      color: #654324;
+      font-weight: 1000;
+      font-size: 20px;
+      line-height: 1.1;
+      text-shadow: 0 2px 0 rgba(255,255,255,.45);
+    }
+
+    .event-subtitle::before,
+    .event-subtitle::after {
+      content: "✦";
+      color: #8d6a44;
+      margin: 0 12px;
+    }
+
+    .modal-body {
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    .puzzle-card {
+      padding: 5px;
+      border: 6px solid #2b1736;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #6e438f, #2d1b3c);
+      box-shadow: 0 5px 0 rgba(28,17,38,.66), inset 0 0 0 3px rgba(255,190,80,.22), 0 0 22px rgba(255,191,66,.34);
+    }
+
+    .puzzle-card::before {
+      background:
+        radial-gradient(circle at 5% 6%, rgba(255,246,153,.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 95% 5%, rgba(255,246,153,.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 99%, rgba(255,246,153,.85) 0 2px, transparent 3px);
+      opacity: .9;
+      z-index: 2;
+    }
+
+    .scene-wrap {
+      min-height: 430px;
+      border: 0;
+      border-radius: 21px;
+      background: #111;
+    }
+
+    .puzzle-stage-image {
+      border-radius: 20px;
+    }
+
+    .frost-vignette {
+      background:
+        linear-gradient(90deg, rgba(255,197,72,.65), transparent 3% 97%, rgba(255,197,72,.65)),
+        linear-gradient(180deg, rgba(255,197,72,.56), transparent 3% 97%, rgba(255,197,72,.56)),
+        radial-gradient(circle at 8% 10%, #fff5a6 0 2px, transparent 3px),
+        radial-gradient(circle at 92% 88%, #fff5a6 0 2px, transparent 3px);
+      mix-blend-mode: screen;
+      opacity: .85;
+      border-radius: 20px;
+    }
+
+    .stage-badge,
+    .stage-tabs {
+      display: none !important;
+    }
+
+    .reward-panel {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      padding: 10px 18px 12px;
+      border: 0;
+      border-radius: 24px;
+      background: rgba(190, 146, 87, .18);
+      box-shadow: inset 0 0 0 3px rgba(137, 95, 52, .18);
+    }
+
+    .reward-slot {
+      min-height: 80px;
+      grid-template-rows: 1fr;
+      padding: 7px;
+      border-width: 4px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #27364a, #132033);
+      box-shadow: 0 4px 0 rgba(35,20,30,.6), inset 0 4px 0 rgba(255,255,255,.16);
+    }
+
+    .reward-slot::before {
+      inset: 7px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 38%, rgba(255,255,255,.18), transparent 52%);
+    }
+
+    .reward-slot.reward-crystal {
+      background: linear-gradient(180deg, #5f2c84, #241936);
+    }
+
+    .reward-slot.reward-chest {
+      background: linear-gradient(180deg, #f7c462, #8e4c18);
+    }
+
+    .reward-slot svg {
+      width: 55px;
+      height: 55px;
+    }
+
+    .reward-slot b {
+      display: none;
+    }
+
+    .reward-slot small {
+      right: 8px;
+      bottom: 4px;
+      font-size: 19px;
+      line-height: 1;
+      text-shadow: 2px 0 #241420, -2px 0 #241420, 0 2px #241420, 0 -2px #241420;
+    }
+
+    .reward-slot.is-current {
+      transform: none;
+      box-shadow: 0 0 14px rgba(255, 206, 87, .38), 0 4px 0 rgba(35,20,30,.6), inset 0 4px 0 rgba(255,255,255,.18);
+    }
+
+    .modal-foot {
+      grid-template-columns: 1fr;
+      gap: 9px;
+    }
+
+    .progress-line {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
+      gap: 6px;
+      align-items: center;
+      padding: 0 12px;
+      color: #5c391d;
+      font-size: 18px;
+      font-weight: 1000;
+      text-align: center;
+      text-shadow: 0 2px 0 rgba(255,255,255,.5);
+    }
+
+    .progress-line span {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .progress-line::before,
+    .progress-line::after {
+      content: "✦";
+      color: #8c6941;
+      font-size: 15px;
+    }
+
+    .progress-line::before {
+      order: -1;
+    }
+
+    .progress-line b {
+      min-width: 62px;
+      padding: 3px 9px;
+      border: 4px solid #493342;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #46364c, #1d1724);
+      color: #ffe7a0;
+      font-size: 19px;
+      line-height: 1;
+      text-shadow: 2px 0 #1c111a, -2px 0 #1c111a, 0 2px #1c111a, 0 -2px #1c111a;
+    }
+
+    .action-btn {
+      justify-self: center;
+      width: min(290px, 78%);
+      height: 62px;
+      border: 5px solid #9a5a08;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(255,255,190,.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 83% 80%, rgba(255,255,190,.85) 0 2px, transparent 3px),
+        linear-gradient(180deg, #fff27a 0%, #ffb321 42%, #eb7d00 100%);
+      color: #fff8df;
+      font-size: 34px;
+      box-shadow: 0 0 18px rgba(255,184,32,.72), inset 0 6px 0 rgba(255,255,255,.38), inset 0 -7px 0 rgba(151,75,0,.2), 0 6px 0 rgba(85,45,5,.66);
+    }
+
+    .action-btn.is-active {
+      background:
+        radial-gradient(circle at 18% 20%, rgba(255,255,190,.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 83% 80%, rgba(255,255,190,.85) 0 2px, transparent 3px),
+        linear-gradient(180deg, #fff27a 0%, #ffb321 42%, #eb7d00 100%);
+      box-shadow: 0 0 22px rgba(255,184,32,.82), inset 0 6px 0 rgba(255,255,255,.38), 0 6px 0 rgba(85,45,5,.66);
+    }
+
     @media (max-height: 780px) {
       .event-modal {
         top: 72px;
@@ -1098,11 +1426,12 @@
             <path d="M8 8l16 16M24 8 8 24" fill="none" stroke-linecap="round"/>
           </svg>
         </button>
-        <div class="title-ribbon">暖火拼圖</div>
+        <div class="title-ribbon">心塵拾憶</div>
         <div class="count-row">
-          <span>活動倒數</span>
+          <span class="timer-icon">◷</span>
           <span class="timer" id="timer">47:59:59</span>
         </div>
+        <div class="event-subtitle">點亮失落的六瞬記憶</div>
       </header>
 
       <div class="modal-body">
@@ -1228,25 +1557,25 @@
         </div>
 
         <div class="reward-panel" aria-label="獎勵進度">
-          <div class="reward-slot" data-reward="1">
+          <div class="reward-slot reward-coin" data-reward="1">
             <svg viewBox="0 0 64 64" aria-hidden="true">
               <circle cx="32" cy="32" r="22" fill="#ffd756" stroke="#2c2130" stroke-width="4"/>
               <circle cx="32" cy="32" r="14" fill="#ffb33f" stroke="#d27a25" stroke-width="3"/>
               <path fill="#ffeaa2" d="M24 30c9-10 17-2 23-8-2 12-11 20-24 21 6-4 9-8 11-15-4 4-7 5-10 2z"/>
             </svg>
             <b>金幣</b>
-            <small>x7935</small>
+            <small>x935</small>
           </div>
-          <div class="reward-slot" data-reward="2">
+          <div class="reward-slot reward-crystal" data-reward="2">
             <svg viewBox="0 0 64 64" aria-hidden="true">
               <path fill="#9eeeff" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="m32 5 17 14-6 31-16 8-14-19 7-28z"/>
               <path fill="#e9ffff" d="m32 10 10 10-13 5-9-10z"/>
               <path fill="none" stroke="#4dbce8" stroke-width="4" stroke-linecap="round" d="M29 25 27 54M42 21 31 58"/>
             </svg>
             <b>冰晶</b>
-            <small>x1915</small>
+            <small>x915</small>
           </div>
-          <div class="reward-slot is-better" data-reward="3">
+          <div class="reward-slot reward-chest" data-reward="3">
             <svg viewBox="0 0 64 64" aria-hidden="true">
               <path fill="#7fd07a" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M10 25h44v29H10z"/>
               <path fill="#9ce08c" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M15 15h34l5 13H10z"/>
@@ -1256,21 +1585,15 @@
             <b>補給箱</b>
             <small>x34</small>
           </div>
-          <div class="reward-slot is-best" data-reward="4">
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <path fill="#fff0b7" stroke="#2c2130" stroke-width="4" stroke-linejoin="round" d="M32 4 43 23l19 9-19 9-11 19-11-19-19-9 19-9z"/>
-              <circle cx="32" cy="32" r="8" fill="#f3a9ff" stroke="#2c2130" stroke-width="4"/>
-              <path fill="#ffffff" opacity=".75" d="m32 10 6 14 14 8-14 8-6 14-6-14-14-8 14-8z"/>
-            </svg>
-            <b>星砂</b>
-            <small>x34</small>
-          </div>
         </div>
       </div>
 
       <footer class="modal-foot">
-        <div class="progress-pill" id="progressText">1/6</div>
-        <button class="action-btn" id="actionBtn" type="button">前往</button>
+        <div class="progress-line">
+          <span id="progressText">通關心源探索第 1 關</span>
+          <b id="progressBadge">1/7</b>
+        </div>
+        <button class="action-btn" id="actionBtn" type="button">點亮</button>
       </footer>
     </section>
 
@@ -1281,15 +1604,16 @@
 
   <script>
     const revealOrder = [8, 9, 14, 15, 2, 7, 10, 13, 16, 20, 3, 4, 6, 11, 17, 21, 1, 5, 12, 18, 19, 0, 22, 23];
-    const revealCounts = [2, 6, 11, 16, 21, 24];
-    const stageLabels = ["10%", "30%", "50%", "70%", "90%", "100%"];
+    const revealCounts = [2, 5, 9, 13, 17, 21, 24];
+    const stageLabels = ["1/7", "2/7", "3/7", "4/7", "5/7", "6/7", "7/7"];
     const stageImages = [
       "assets/puzzle-stages/stage-1.png",
       "assets/puzzle-stages/stage-2.png",
       "assets/puzzle-stages/stage-3.png",
       "assets/puzzle-stages/stage-4.png",
       "assets/puzzle-stages/stage-5.png",
-      "assets/puzzle-stages/stage-6.png"
+      "assets/puzzle-stages/stage-6.png",
+      "assets/puzzle-stages/stage-7.png"
     ];
     const stageFilters = [
       { gray: .96, sat: .42, bright: .42 },
@@ -1297,6 +1621,7 @@
       { gray: .74, sat: .68, bright: .70 },
       { gray: .58, sat: .82, bright: .82 },
       { gray: .34, sat: .96, bright: .95 },
+      { gray: .24, sat: 1.02, bright: 1.0 },
       { gray: .16, sat: 1.08, bright: 1.05 }
     ];
 
@@ -1304,6 +1629,7 @@
     const tabsEl = document.getElementById("stageTabs");
     const badgeEl = document.getElementById("stageBadge");
     const progressEl = document.getElementById("progressText");
+    const progressBadge = document.getElementById("progressBadge");
     const actionBtn = document.getElementById("actionBtn");
     const modal = document.querySelector(".event-modal");
     const shade = document.querySelector(".shade");
@@ -1325,7 +1651,7 @@
       pieceNodes.push(node);
     }
 
-    for (let i = 1; i <= 6; i += 1) {
+    for (let i = 1; i <= stageImages.length; i += 1) {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "stage-tab";
@@ -1337,7 +1663,7 @@
     }
 
     function setStage(nextStage) {
-      stage = Math.max(1, Math.min(6, nextStage));
+      stage = Math.max(1, Math.min(stageImages.length, nextStage));
       const count = revealCounts[stage - 1];
       const visibleSet = new Set(revealOrder.slice(0, count));
 
@@ -1350,7 +1676,7 @@
         btn.classList.toggle("is-done", index < stage - 1);
       });
 
-      const currentRewardIndex = Math.min(3, Math.floor((stage - 1) / 2));
+      const currentRewardIndex = Math.min(rewardSlots.length - 1, Math.floor((stage - 1) / 2));
       rewardSlots.forEach((slot, index) => {
         slot.classList.toggle("is-current", index === currentRewardIndex);
       });
@@ -1365,16 +1691,17 @@
       scene.style.setProperty("--bright", filter.bright);
       puzzleStageImage.src = stageImages[stage - 1];
       badgeEl.textContent = stageLabels[stage - 1];
-      progressEl.textContent = `${stage}/6`;
-      actionBtn.textContent = stage >= 6 ? "點亮" : "前往";
-      actionBtn.classList.toggle("is-active", stage >= 6);
+      progressEl.textContent = `通關心源探索第 ${stage} 關`;
+      progressBadge.textContent = `${stage}/${stageImages.length}`;
+      actionBtn.textContent = stage >= stageImages.length ? "點亮完成" : "點亮";
+      actionBtn.classList.toggle("is-active", stage >= stageImages.length);
     }
 
     actionBtn.addEventListener("click", () => {
-      if (stage < 6) {
+      if (stage < stageImages.length) {
         setStage(stage + 1);
       } else {
-        actionBtn.textContent = "已點亮";
+        actionBtn.textContent = "點亮完成";
         actionBtn.classList.add("is-active");
         furnitureLights.forEach((item) => item.classList.add("is-lit"));
       }
